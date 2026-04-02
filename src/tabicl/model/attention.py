@@ -51,8 +51,7 @@ def sdpa_with_flattened_batch(
     v = v.reshape(-1, *v.shape[-3:])
     if attn_mask is not None:
         attn_mask = attn_mask.reshape(-1, *attn_mask.shape[-3:])
-    with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
-        out = F.scaled_dot_product_attention(q, k, v, attn_mask, dropout_p)
+    out = F.scaled_dot_product_attention(q, k, v, attn_mask, dropout_p)
 
     return out.view(q_shape)
 
