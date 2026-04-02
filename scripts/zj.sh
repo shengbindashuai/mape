@@ -44,7 +44,7 @@ torchrun  --standalone --nproc_per_node=8 ./src/tabicl/train/run.py \
             --icl_nhead 4 \
             --ff_factor 2 \
             --norm_first True \
-            --checkpoint_dir ./stage1_compile/checkpoint/dir  \
+            --checkpoint_dir ./stage1_compile_tf32/checkpoint/dir  \
             --save_temp_every 50 \
             --save_perm_every 5000 \
             --only_load_model True \

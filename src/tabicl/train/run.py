@@ -8,6 +8,7 @@ from contextlib import nullcontext
 
 import math
 from tkinter.scrolledtext import example
+import statistics
 
 import numpy as np
 
@@ -92,6 +93,21 @@ class Trainer:
         self.configure_optimizer()
         self.configure_amp()
         self.load_checkpoint()
+        self.step_time_list = []
+        self.avg_step_1k = None
+
+    def print_1k_step_avg(self):
+        """打印前1000步平均时间，仅主进程打印"""
+        if not self.master_process:
+            return
+        if len(self.step_time_list) >= 1000 and self.avg_step_1k is None:
+            total = sum(self.step_time_list[:1000])
+            self.avg_step_1k = total / 1000
+            print(f"\n===== 前1000步平均耗时 =====")
+            print(f"总时间: {total:.2f}s")
+            print(f"平均每步: {self.avg_step_1k:.4f}s")
+            print(f"速度: {1 / self.avg_step_1k:.2f} step/s\n")
+
 
     def configure_ddp(self):
         """Set up distributed training and system configuration.
@@ -494,13 +510,21 @@ class Trainer:
             prog = range(self.curr_step, self.config.max_steps)
 
         for step in prog:
-            with Timer() as prior_timer:
-                batch = next(iterator)
-            with Timer() as train_timer:
-                results = self.run_batch(batch)
+            # 整步总耗时
+            with Timer() as step_timer:
+                with Timer() as prior_timer:
+                    batch = next(iterator)
+                with Timer() as train_timer:
+                    results = self.run_batch(batch)
             self.curr_step = step + 1
 
+            # 记录前1000步时间
+            if self.curr_step <= 1000:
+                self.step_time_list.append(step_timer.elapsed)
+
             if self.master_process:
+                if self.curr_step == 1000:
+                    self.print_1k_step_avg()
                 results.update({"prior_time": prior_timer.elapsed, "train_time": train_timer.elapsed})
                 if isinstance(prog, tqdm):
                     prog.set_postfix(**{k: (round(v, 3) if isinstance(v, float) else v) for k, v in results.items()})
