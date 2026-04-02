@@ -839,6 +839,8 @@ class Trainer:
 if __name__ == "__main__":
     parser = build_parser()
     cfg = parser.parse_args()
+    import torch
+    torch.set_float32_matmul_precision('high')
     trainer = Trainer(cfg)
     trainer.train()
 
