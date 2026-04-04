@@ -169,7 +169,7 @@ def build_parser():
     )
     parser.add_argument(
         "--model_compile",
-        default=True,
+        default=False,
         type=str2bool,
         help="If True, compile the model using torch.compile for speedup",
     )
