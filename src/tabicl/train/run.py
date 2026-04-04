@@ -356,7 +356,7 @@ class Trainer:
             #     device_type="cuda", dtype=torch.float16 if self.config.dtype == "float16" else torch.float32
             # )
             self.amp_ctx = torch.autocast(
-                device_type="cuda", dtype=torch.bfloat16 if self.config.dtype == "bfloat16" else torch.float32
+                device_type="cuda", dtype=torch.float16 if self.config.dtype == "bfloat16" else torch.float32
             )
         else:
             self.amp_ctx = nullcontext()
