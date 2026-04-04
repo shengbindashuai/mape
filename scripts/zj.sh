@@ -11,7 +11,7 @@ torchrun  --standalone --nproc_per_node=8 ./src/tabicl/train/run.py \
             --wandb_dir /my/wandb/dir \
             --wandb_mode online \
             --device cuda \
-            --dtype float32 \
+            --dtype bfloat16 \
             --np_seed 43 \
             --torch_seed 42 \
             --max_steps 160000 \
